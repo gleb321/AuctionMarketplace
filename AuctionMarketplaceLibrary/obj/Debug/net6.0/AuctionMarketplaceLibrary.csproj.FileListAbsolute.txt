@@ -1,0 +1,14 @@
+/Users/glebevlakhov/RiderProjects/Internships/AuctionMarketplace/AuctionMarketplaceLibrary/bin/Debug/net6.0/AuctionMarketplaceLibrary.deps.json
+/Users/glebevlakhov/RiderProjects/Internships/AuctionMarketplace/AuctionMarketplaceLibrary/bin/Debug/net6.0/AuctionMarketplaceLibrary.dll
+/Users/glebevlakhov/RiderProjects/Internships/AuctionMarketplace/AuctionMarketplaceLibrary/bin/Debug/net6.0/AuctionMarketplaceLibrary.pdb
+/Users/glebevlakhov/RiderProjects/Internships/AuctionMarketplace/AuctionMarketplaceLibrary/obj/Debug/net6.0/AuctionMarketplaceLibrary.csproj.AssemblyReference.cache
+/Users/glebevlakhov/RiderProjects/Internships/AuctionMarketplace/AuctionMarketplaceLibrary/obj/Debug/net6.0/AuctionMarketplaceLibrary.GeneratedMSBuildEditorConfig.editorconfig
+/Users/glebevlakhov/RiderProjects/Internships/AuctionMarketplace/AuctionMarketplaceLibrary/obj/Debug/net6.0/AuctionMarketplaceLibrary.AssemblyInfoInputs.cache
+/Users/glebevlakhov/RiderProjects/Internships/AuctionMarketplace/AuctionMarketplaceLibrary/obj/Debug/net6.0/AuctionMarketplaceLibrary.AssemblyInfo.cs
+/Users/glebevlakhov/RiderProjects/Internships/AuctionMarketplace/AuctionMarketplaceLibrary/obj/Debug/net6.0/AuctionMarketplaceLibrary.csproj.CoreCompileInputs.cache
+/Users/glebevlakhov/RiderProjects/Internships/AuctionMarketplace/AuctionMarketplaceLibrary/obj/Debug/net6.0/AuctionMarketplaceLibrary.dll
+/Users/glebevlakhov/RiderProjects/Internships/AuctionMarketplace/AuctionMarketplaceLibrary/obj/Debug/net6.0/refint/AuctionMarketplaceLibrary.dll
+/Users/glebevlakhov/RiderProjects/Internships/AuctionMarketplace/AuctionMarketplaceLibrary/obj/Debug/net6.0/AuctionMarketplaceLibrary.pdb
+/Users/glebevlakhov/RiderProjects/Internships/AuctionMarketplace/AuctionMarketplaceLibrary/obj/Debug/net6.0/ref/AuctionMarketplaceLibrary.dll
+/Users/glebevlakhov/RiderProjects/Internships/AuctionMarketplace/AuctionMarketplaceLibrary/bin/Debug/net6.0/AuctionMarketplaceLibrary.runtimeconfig.json
+/Users/glebevlakhov/RiderProjects/Internships/AuctionMarketplace/AuctionMarketplaceLibrary/obj/Debug/net6.0/AuctionMarketplaceLibrary.genruntimeconfig.cache

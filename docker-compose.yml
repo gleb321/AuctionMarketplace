@@ -1,0 +1,18 @@
+version: "3.5"
+
+services:
+  auth-service:
+    container_name: authserver
+    build: 
+      context: .
+      dockerfile: AuthenticationServer/Dockerfile
+    ports:
+      - 7137:7137
+  pgdatabase-service:
+    image: postgres:14.4
+    container_name: pgdatabase
+    environment:
+      - POSTGRES_USER=auth_server
+      - POSTGRES_PASSWORD=psqlpass218
+    ports:
+      - 5432:5432
