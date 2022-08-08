@@ -25,7 +25,7 @@ namespace AuthenticationServer.Controllers {
         public async Task<IActionResult> Register([FromBody] RegistrationModel registrationAccount) {
             User user = new User(registrationAccount.Email, registrationAccount.Name, registrationAccount.Surname);
             Account account = new Account(registrationAccount.Email,
-                Cryptographer.HashPassword(registrationAccount.Password), Account.Role.Admin);
+                Cryptographer.HashPassword(registrationAccount.Password), Account.Role.User);
 
             var pgDataBaseContexts = await Task.WhenAll(
                 _pgDataBaseFactory.CreateDbContextAsync(), _pgDataBaseFactory.CreateDbContextAsync());
