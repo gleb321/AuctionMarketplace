@@ -6,6 +6,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuctionService", "AuctionSe
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuctionMarketplaceLibrary", "AuctionMarketplaceLibrary\AuctionMarketplaceLibrary.csproj", "{01425972-1319-4153-9194-AEB21CBAD177}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuctionLiveService", "AuctionLiveService\AuctionLiveService.csproj", "{EB70AF97-0AB6-41A4-BC4A-2D47315DD92A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,5 +26,9 @@ Global
 		{01425972-1319-4153-9194-AEB21CBAD177}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{01425972-1319-4153-9194-AEB21CBAD177}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{01425972-1319-4153-9194-AEB21CBAD177}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EB70AF97-0AB6-41A4-BC4A-2D47315DD92A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EB70AF97-0AB6-41A4-BC4A-2D47315DD92A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EB70AF97-0AB6-41A4-BC4A-2D47315DD92A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EB70AF97-0AB6-41A4-BC4A-2D47315DD92A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

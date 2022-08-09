@@ -1,0 +1,11 @@
+{
+  "Version": 1,
+  "Hash": "O6ewompQp0H7B/oZ27qd7Jfxj61KaDxuMih0xZRD5lU=",
+  "Source": "AuctionLiveService",
+  "BasePath": "_content/AuctionLiveService",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": []
+}
