@@ -40,5 +40,10 @@ namespace AuctionLiveService.Controllers {
 
             return Ok("Bid was successfully made.");
         }
+
+        [HttpGet("get_bid")]
+        public IActionResult GetCurrentBid([FromQuery] int id) {
+            return Ok();
+        }
     }
 }
