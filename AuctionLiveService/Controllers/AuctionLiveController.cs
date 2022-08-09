@@ -18,6 +18,7 @@ namespace AuctionLiveService.Controllers {
         
         [HttpPost("add")]
         public IActionResult Add([FromBody] InitialModel auction) {
+            Console.WriteLine("New request");
             try {
                 _auctionManagementService.Add(new Auction(auction.Id, auction.SellerId, auction.StartBid,
                     DateTime.ParseExact(auction.StartTime, "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture),

@@ -19,6 +19,7 @@ namespace AuctionLiveService {
             if (env.IsDevelopment()) {
                 app.UseDeveloperExceptionPage();
             }
+
             
             app.UseRouting();
             app.UseEndpoints(endpoints => {

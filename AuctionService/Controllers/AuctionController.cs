@@ -1,6 +1,12 @@
 using System;
 using System.Linq;
 using System.Data.SqlClient;
+using System.Net;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using AuctionMarketplaceLibrary;
 using Microsoft.AspNetCore.Mvc;
@@ -35,8 +41,17 @@ namespace AuctionService.Controllers {
                 return BadRequest("Trouble creating new auction.");
             }
             
+            var data = new {id, auction.SellerId, auction.StartTime, auction.FinishTime, auction.StartBid};
+            string json = JsonSerializer.Serialize(data);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+            string url = $"http://{Config.Host}:{Config.AuctionLiveServicePort}/auction_live/add";
+            var response = await new HttpClient().PostAsync(new Uri(url), content);
+            if (response.StatusCode == HttpStatusCode.OK) {
+                return Ok("Auction was successfully added.");
+            }
             
-            return Ok("Auction was successfully added.");
+            
+            return BadRequest("Auction was not added.");
         }
     }
 }
