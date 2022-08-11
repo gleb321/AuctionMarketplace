@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 
 namespace AuctionService.Models {
-    public class RegistrationModel {
+    public class ClientAuctionModel {
         [Required]
         public string? Title { get; set; }
         

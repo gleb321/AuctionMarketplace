@@ -30,10 +30,11 @@ namespace AuctionLiveService.Controllers {
             return Ok("Auction was successfully added.");
         }
 
-        [HttpGet("make_bid")]
+        [HttpPost("make_bid")]
         public async Task<IActionResult> MakeBid([FromQuery] Bid bid) {
             try {
                 await _bidService.MakeBid(bid);
+                
             } catch (InvalidOperationException invalidOperationException) {
                 return BadRequest(invalidOperationException.Message);
             } catch (ArgumentException argumentException) {
@@ -41,6 +42,15 @@ namespace AuctionLiveService.Controllers {
             }
 
             return Ok("Bid was successfully made.");
+        }
+
+        [HttpGet("is_active")]
+        public IActionResult IsActive([FromQuery] int id) {
+            if (!_auctionManagementService.Auctions.ContainsKey(id)) {
+                return NotFound("Auction with this id does not exist.");
+            }
+            
+            return Ok(_auctionManagementService.Auctions[id].IsActive);
         }
 
         [HttpGet("get_bid")]

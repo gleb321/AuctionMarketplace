@@ -12,17 +12,35 @@ using Npgsql;
 
 namespace AuctionService.Controllers {
     [Route("/auction/")]
-    public class AuctionController : Controller {
+    public class AuctionController: Controller {
         private PgAuctionsDataBaseContext _pgDataBase;
-        public AuctionController(PgAuctionsDataBaseContext pgDataBase) {
+        private HttpClient _client;
+
+        private enum OperationType {
+            Update, 
+            Delete
+        }
+        public AuctionController(PgAuctionsDataBaseContext pgDataBase, HttpClient client) {
             _pgDataBase = pgDataBase;
+            _client = client;
         }
         
+        /// <summary>
+        /// Метод для запроса текущего состояния аукциона
+        /// </summary>
+        /// <param name="id">Id аукциона</param>
+        /// <returns>Task, возвращающий сообщение о текщуем состоянии аукциона</returns>
+        private Task<HttpResponseMessage> GetAuctionActivityInformation(int id) {
+            string url = $"http://{Config.Host}:{Config.AuctionLiveServicePort}/auction_live/is_active?id={id}";
+            return _client.GetAsync(url);
+        }
+
         [HttpPost("add")]
-        public async Task<IActionResult> Add([FromBody] RegistrationModel auction) {
+        public async Task<IActionResult> Add([FromBody] ClientAuctionModel auction) {
             try {
                 using (var connection = new NpgsqlConnection(_pgDataBase.GetConnectionString())) {
                     await connection.OpenAsync();
+                    //TODO использовать библиотеку для построения запросов
                     string text = "BEGIN;INSERT INTO Auctions (title, description, start_bid, start_time, finish_time, seller_id) " +
                                   $"VALUES ({auction}) RETURNING id;";
                     var command = new NpgsqlCommand(text, connection);
@@ -35,7 +53,7 @@ namespace AuctionService.Controllers {
                     var data = new {id, auction.SellerId, auction.StartTime, auction.FinishTime, auction.StartBid};
                     var content = new StringContent(JsonSerializer.Serialize(data), Encoding.UTF8, "application/json");
                     string url = $"http://{Config.Host}:{Config.AuctionLiveServicePort}/auction_live/add";
-                    var response = await new HttpClient().PostAsync(new Uri(url), content);
+                    var response = await _client.PostAsync(new Uri(url), content);
                     if (response.StatusCode == HttpStatusCode.OK) {
                         command.CommandText = "COMMIT;";
                         await command.ExecuteNonQueryAsync();
@@ -49,6 +67,93 @@ namespace AuctionService.Controllers {
             } catch (Exception exception) {
                 return BadRequest("Trouble creating new auction.");
             }
+        }
+        
+        
+        
+        [HttpPost("update")]
+        public async Task<IActionResult> Update([FromQuery] int id, [FromBody] ClientAuctionModel auction) {
+            try {
+                using (var connection = new NpgsqlConnection(_pgDataBase.GetConnectionString())) {
+                    var responseSending = GetAuctionActivityInformation(id);
+                    //TODO использовать библиотеку для построения запросов
+                    string text = "BEGIN;UPDATE Auctions SET (title, description, start_bid, start_time, finish_time, seller_id) = " +
+                                  $"({auction}) WHERE id = {id} RETURNING seller_id;";
+                    var command = new NpgsqlCommand(text, connection);
+                    if (await TryExecuteTransaction(command, responseSending, "gleb@evlakhov.com")) {
+                        return Ok("Auction was successfully updated.");
+                    }
+                    
+                    return await RollbackTransaction(command, responseSending.Result, OperationType.Update);
+                }
+            } catch (Exception exception) {
+                return BadRequest("Trouble updating auction.");
+            }
+        }
+
+        [HttpPost("delete")]
+        public async Task<IActionResult> Delete([FromQuery] int id) {
+            try { 
+                using (var connection = new NpgsqlConnection(_pgDataBase.GetConnectionString())) {
+                    var responseSending = GetAuctionActivityInformation(id);
+                    //TODO использовать библиотеку для построения запросов
+                    string text = $"BEGIN;DELETE FROM Auctions WHERE id = {id} RETURNING seller_id;";
+                    var command = new NpgsqlCommand(text, connection);
+                    if (await TryExecuteTransaction(command, responseSending, "gleb@evlakhov.com")) {
+                        return Ok("Auction was successfully deleted.");
+                    }
+                    
+                    return await RollbackTransaction(command, responseSending.Result, OperationType.Delete);
+                }
+            } catch (Exception exception) {
+                return BadRequest("Trouble deleting auction.");
+            }
+        }
+
+        /// <summary>
+        /// Метод, пробующий выполнить транзакцию
+        /// </summary>
+        /// <param name="command">SQL команда</param>
+        /// <param name="responseSending">Task отправленный на AuctionLiveService, возвращающий информацию об активности аукциона</param>
+        /// <param name="senderId">Id клиента, запросившего транзакцию</param>
+        /// <returns>Получилось ли исполнить транзакцию</returns>
+        private async Task<bool> TryExecuteTransaction(NpgsqlCommand command, Task<HttpResponseMessage> responseSending, string senderId) {
+            string sellerId;
+            using (var reader = await command.ExecuteReaderAsync()) {
+                await reader.ReadAsync();
+                sellerId = (string) reader.GetValue(0);
+            }
+
+            var response = await responseSending;
+            if (response.StatusCode == HttpStatusCode.OK && Boolean.Parse(await response.Content.ReadAsStringAsync()) &&
+                sellerId == senderId) {
+                command.CommandText = "COMMIT;";
+                await command.ExecuteNonQueryAsync();
+                return true;
+            }
+
+            return false;
+        }
+        
+        /// <summary>
+        /// Откатывает изменения в бд
+        /// </summary>
+        /// <param name="command">SQL команда</param>
+        /// <param name="response">Ответ AuctionLiveService об активности аукциона</param>
+        /// <param name="type">Тип транзакции</param>
+        /// <returns>Сообщение с причиной отмены транзакции</returns>
+        private async Task<IActionResult> RollbackTransaction(NpgsqlCommand command, HttpResponseMessage response, OperationType type) {
+            command.CommandText = "ROLLBACK;";
+            await command.ExecuteNonQueryAsync();
+            if (response.StatusCode == HttpStatusCode.NotFound) {
+                return NotFound("Auction with this id already finished or does not exist.");
+            }
+            
+            if (Boolean.Parse(await response.Content.ReadAsStringAsync())) {
+                return BadRequest($"Impossible to {type.ToString().ToLower()} running up auction.");
+            }
+
+            return BadRequest($"Only owner of the auction can {type.ToString().ToLower()} it.");
         }
     }
 }

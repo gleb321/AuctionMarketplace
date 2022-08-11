@@ -1,4 +1,5 @@
 using System;
+using System.Net.Http;
 using AuctionLiveService.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -9,6 +10,7 @@ namespace AuctionLiveService {
     public class Startup {
         public void ConfigureServices(IServiceCollection services) {
             services.AddControllers();
+            services.AddScoped<HttpClient>();
             services.AddSingleton<AuctionManagementService>();
             services.AddSingleton<BidService>(serviceProvider => new BidService(
                 serviceProvider.GetRequiredService<AuctionManagementService>().Auctions,
