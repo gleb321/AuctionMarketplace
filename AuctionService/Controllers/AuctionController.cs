@@ -1,17 +1,17 @@
 using System;
-using System.Collections.Generic;
-using System.Data.Entity;
 using System.Net;
+using System.Linq;
 using System.Text;
 using System.Net.Http;
 using System.Text.Json;
+using System.Data.Entity;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 using AuctionService.Models;
 using AuctionService.Services;
 using AuctionMarketplaceLibrary;
 using Microsoft.AspNetCore.Mvc;
 using Npgsql;
-using System.Linq;
 
 namespace AuctionService.Controllers {
     [Route("/auction/")]
@@ -110,7 +110,7 @@ namespace AuctionService.Controllers {
                 }
             }
             
-            return Ok("Auction was set active;");
+            return Ok("Auction was set active.");
         }
         
         [HttpPost("update")]
@@ -128,6 +128,7 @@ namespace AuctionService.Controllers {
                     return await RollbackTransaction(command, responseSending.Result, OperationType.Update);
                 }
             } catch (Exception exception) {
+                Console.WriteLine(exception.Message);
                 return BadRequest("Trouble updating auction.");
             }
         }
@@ -159,13 +160,14 @@ namespace AuctionService.Controllers {
         /// <returns>Получилось ли исполнить транзакцию</returns>
         private async Task<bool> TryExecuteTransaction(NpgsqlCommand command, Task<HttpResponseMessage> responseSending, string senderId) {
             string sellerId;
+            await command.Connection.OpenAsync();
             using (var reader = await command.ExecuteReaderAsync()) {
                 await reader.ReadAsync();
                 sellerId = (string) reader.GetValue(0);
             }
 
             var response = await responseSending;
-            if (response.StatusCode == HttpStatusCode.OK && Boolean.Parse(await response.Content.ReadAsStringAsync()) &&
+            if (response.StatusCode == HttpStatusCode.OK && !Boolean.Parse(await response.Content.ReadAsStringAsync()) &&
                 sellerId == senderId) {
                 command.CommandText = "COMMIT;";
                 await command.ExecuteNonQueryAsync();

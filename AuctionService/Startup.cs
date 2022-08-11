@@ -1,4 +1,5 @@
 using System;
+using System.Net.Http;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
@@ -11,6 +12,7 @@ namespace AuctionService {
     public class Startup {
         public void ConfigureServices(IServiceCollection services) {
             services.AddControllers();
+            services.AddScoped<HttpClient>();
             services.AddDbContext<PgAuctionsDataBaseContext>();
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options => {
                 options.RequireHttpsMetadata = false;
