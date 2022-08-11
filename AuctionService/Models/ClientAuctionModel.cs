@@ -19,6 +19,8 @@ namespace AuctionService.Models {
         
         [Required]
         public decimal StartBid { get; set; }
+        
+        public string? ImagePath { get; set; }
 
         public override string ToString() {
             return $"'{Title}', '{Description}', {StartBid}, '{StartTime}', '{FinishTime}', '{SellerId}'";

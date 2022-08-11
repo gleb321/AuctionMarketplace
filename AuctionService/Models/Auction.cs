@@ -8,7 +8,7 @@ namespace AuctionService.Models {
         [Key]
         [Column("id", TypeName = "serial")]
         [Required]
-        public ulong Id { get; set; }
+        public int Id { get; set; }
         
         [Column("title")]
         [Required]
@@ -39,6 +39,13 @@ namespace AuctionService.Models {
         
         [Column("customer_id")]
         public string? CustomerId { get; set; }
+        
+        [Column("is_active")]
+        [Required]
+        public bool IsActive { get; set; }
+        
+        [Column("image_path")]
+        public bool ImagePath { get; set; }
         public override string ToString() {
             return $"{Id}\n{Title}\n{Description}\n{StartTime} - {FinishTime}\n{StartBid}$ -> {LastBid}$\n" + 
                    $"SellerId: {SellerId}\nCustomerId: {CustomerId}";

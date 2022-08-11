@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Data.Entity;
 using System.Net;
 using System.Text;
 using System.Net.Http;
@@ -9,6 +11,7 @@ using AuctionService.Services;
 using AuctionMarketplaceLibrary;
 using Microsoft.AspNetCore.Mvc;
 using Npgsql;
+using System.Linq;
 
 namespace AuctionService.Controllers {
     [Route("/auction/")]
@@ -36,7 +39,7 @@ namespace AuctionService.Controllers {
         }
 
         [HttpPost("add")]
-        public async Task<IActionResult> Add([FromBody] ClientAuctionModel auction) {
+        public async Task<IActionResult> AddAuction([FromBody] ClientAuctionModel auction) {
             try {
                 using (var connection = new NpgsqlConnection(_pgDataBase.GetConnectionString())) {
                     await connection.OpenAsync();
@@ -68,15 +71,53 @@ namespace AuctionService.Controllers {
                 return BadRequest("Trouble creating new auction.");
             }
         }
+
+        [HttpGet("get/by_id")]
+        public async Task<IActionResult> GetAuction([FromQuery] int id) {
+            var auction = await (from dbAuction in _pgDataBase.Auctions
+                where dbAuction.Id == id
+                select dbAuction).SingleOrDefaultAsync();
+
+            if (auction is null) {
+                return NotFound("Auction with this id does not exist.");
+            }
+            
+            return Ok(auction);
+        }
         
-        
+        [HttpGet("get/all")]
+        public IEnumerable<Auction> GetAllAuctions() {
+            return from auction in _pgDataBase.Auctions select auction;
+        }
+
+        [HttpGet("get/all/active")]
+        public IEnumerable<Auction> GetAllActiveAuctions() {
+            return from auction in _pgDataBase.Auctions
+                where auction.IsActive
+                select auction;
+        }
+
+        [HttpPost("set/active")]
+        public async Task<IActionResult> UpdateAuctionActivityInformation([FromQuery] int id) {
+            using (var connection = new NpgsqlConnection(_pgDataBase.GetConnectionString())) {
+                await connection.OpenAsync();
+                string text = $"BEGIN;UPDATE Auctions SET is_active = true WHERE id = {id}; COMMIT;";
+                var command = new NpgsqlCommand(text, connection);
+                try {
+                    command.ExecuteNonQuery();
+                } catch (Exception exception) {
+                    Console.WriteLine(exception.Message);
+                }
+            }
+            
+            return Ok("Auction was set active;");
+        }
         
         [HttpPost("update")]
-        public async Task<IActionResult> Update([FromQuery] int id, [FromBody] ClientAuctionModel auction) {
+        public async Task<IActionResult> UpdateAuction([FromQuery] int id, [FromBody] ClientAuctionModel auction) {
             try {
                 using (var connection = new NpgsqlConnection(_pgDataBase.GetConnectionString())) {
                     var responseSending = GetAuctionActivityInformation(id);
-                    //TODO использовать библиотеку для построения запросов
                     string text = "BEGIN;UPDATE Auctions SET (title, description, start_bid, start_time, finish_time, seller_id) = " +
                                   $"({auction}) WHERE id = {id} RETURNING seller_id;";
                     var command = new NpgsqlCommand(text, connection);
@@ -92,11 +133,10 @@ namespace AuctionService.Controllers {
         }
 
         [HttpPost("delete")]
-        public async Task<IActionResult> Delete([FromQuery] int id) {
+        public async Task<IActionResult> DeleteAuction([FromQuery] int id) {
             try { 
                 using (var connection = new NpgsqlConnection(_pgDataBase.GetConnectionString())) {
                     var responseSending = GetAuctionActivityInformation(id);
-                    //TODO использовать библиотеку для построения запросов
                     string text = $"BEGIN;DELETE FROM Auctions WHERE id = {id} RETURNING seller_id;";
                     var command = new NpgsqlCommand(text, connection);
                     if (await TryExecuteTransaction(command, responseSending, "gleb@evlakhov.com")) {
