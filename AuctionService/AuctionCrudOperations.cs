@@ -39,7 +39,7 @@ namespace AuctionService {
                     await reader.ReadAsync();
                     (sellerId, isActive) = ((string) reader.GetValue(0), (bool) reader.GetValue(1));
                 }
-
+                
                 if (!isActive && sellerId == clientId) {
                     command.CommandText = "COMMIT;";
                 } else {
@@ -52,7 +52,7 @@ namespace AuctionService {
                     throw new InvalidOperationException($"Impossible to {type.ToString().ToLower()} active auction.");
                 }
 
-                if (sellerId != "gleb@evlakhov.com") {
+                if (sellerId != clientId) {
                     throw new InvalidOperationException($"Only owner of auction can {type.ToString().ToLower()} it.");
                 }
             }

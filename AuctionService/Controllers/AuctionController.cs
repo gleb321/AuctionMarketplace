@@ -24,13 +24,13 @@ namespace AuctionService.Controllers {
             _client = client;
         }
 
-        [Authorize(Roles = "admin")]
+        [Authorize(Roles = "Admin")]
         [HttpPost("add")]
         public async Task<IActionResult> AddAuction([FromBody] ClientAuctionModel auction) {
             try {
                 //TODO использовать библиотеку для построения запросов
                 string text = "BEGIN;INSERT INTO Auctions (title, description, start_bid, start_time, finish_time, seller_id) " +
-                              $"VALUES ({auction}) RETURNING id;";
+                              $"VALUES ({auction.ToInsertString()}) RETURNING id;";
                 Func<int, Task<HttpResponseMessage>> getResponse = id => {
                     var data = new {id, auction.SellerId, auction.StartTime, auction.FinishTime, auction.StartBid};
                     var content = new StringContent(JsonSerializer.Serialize(data), Encoding.UTF8, "application/json");
@@ -39,7 +39,7 @@ namespace AuctionService.Controllers {
                 };
                 
                 if (await AuctionCrudOperations.TryCreateAuction(_pgDataBase.GetConnectionString(), text, getResponse)) {
-                    return Ok("Auction was successfully added");
+                    return Ok("Auction was successfully added.");
                 } 
                 
                 return BadRequest("Auction was not added.");
@@ -48,15 +48,14 @@ namespace AuctionService.Controllers {
             }
         }
         
-        [Authorize(Roles = "admin")]
+        [Authorize(Roles = "Admin")]
         [HttpPost("update")]
         public async Task<IActionResult> UpdateAuction([FromQuery] int id, [FromBody] ClientAuctionModel auction) {
             try {
-                string text = "BEGIN;UPDATE Auctions SET (title, description, start_bid, start_time, finish_time, seller_id) = " +
-                              $"({auction}) WHERE id = {id} RETURNING seller_id, is_active;";
+                string text = "BEGIN;UPDATE Auctions SET (title, description, start_bid, start_time, finish_time) = " +
+                              $"({auction.ToUpdateString()}) WHERE id = {id} RETURNING seller_id, is_active;";
                 string token = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
                 (string clientId, string role) = JwtParser.GetClaims(token, Authenticator.TokenType.Access);
-                
                 await AuctionCrudOperations.ChangeAuction(_pgDataBase.GetConnectionString(), AuctionCrudOperations.ChangeType.Update,
                     text,clientId);
                 
@@ -66,14 +65,13 @@ namespace AuctionService.Controllers {
             }
         }
 
-        [Authorize(Roles = "admin")]
+        [Authorize(Roles = "Admin")]
         [HttpDelete("delete")]
         public async Task<IActionResult> DeleteAuction([FromQuery] int id) {
             try {
                 string text = $"BEGIN;DELETE FROM Auctions WHERE id = {id} RETURNING seller_id, is_active;";
                 string token = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
                 (string clientId, string role) = JwtParser.GetClaims(token, Authenticator.TokenType.Access);
-                
                 await AuctionCrudOperations.ChangeAuction(_pgDataBase.GetConnectionString(), AuctionCrudOperations.ChangeType.Delete,
                     text, clientId);
                 
@@ -103,6 +101,7 @@ namespace AuctionService.Controllers {
 
         [HttpGet("get/all/active")]
         public IEnumerable<Auction> GetAllActiveAuctions() {
+            //TODO использовать butch запросы
             return from auction in _pgDataBase.Auctions where auction.IsActive select auction;
         }
 

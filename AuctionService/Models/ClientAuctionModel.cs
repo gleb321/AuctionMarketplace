@@ -22,7 +22,11 @@ namespace AuctionService.Models {
         
         public string? ImagePath { get; set; }
 
-        public override string ToString() {
+        public string ToUpdateString() {
+            return $"'{Title}', '{Description}', {StartBid}, '{StartTime}', '{FinishTime}'";
+        }
+
+        public string ToInsertString() {
             return $"'{Title}', '{Description}', {StartBid}, '{StartTime}', '{FinishTime}', '{SellerId}'";
         }
     }

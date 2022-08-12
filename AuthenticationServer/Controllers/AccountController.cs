@@ -73,7 +73,7 @@ namespace AuthenticationServer.Controllers {
         }
         
         [Authorize]
-        [HttpPost("refresh")]
+        [HttpGet("refresh")]
         public IActionResult Refresh() {
             string refreshToken = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
             (string login, string role) = JwtParser.GetClaims(refreshToken, Authenticator.TokenType.Refresh);
