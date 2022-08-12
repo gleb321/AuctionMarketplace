@@ -45,7 +45,7 @@ namespace AuctionService.Models {
         public bool IsActive { get; set; }
         
         [Column("image_path")]
-        public bool ImagePath { get; set; }
+        public string? ImagePath { get; set; }
         public override string ToString() {
             return $"{Id}\n{Title}\n{Description}\n{StartTime} - {FinishTime}\n{StartBid}$ -> {LastBid}$\n" + 
                    $"SellerId: {SellerId}\nCustomerId: {CustomerId}";
