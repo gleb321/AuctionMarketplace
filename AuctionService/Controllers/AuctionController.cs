@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using AuctionService.Models;
 using AuctionService.Services;
 using AuctionMarketplaceLibrary;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Npgsql;
 
@@ -23,6 +24,7 @@ namespace AuctionService.Controllers {
             _client = client;
         }
 
+        [Authorize(Roles = "admin")]
         [HttpPost("add")]
         public async Task<IActionResult> AddAuction([FromBody] ClientAuctionModel auction) {
             try {
@@ -46,23 +48,35 @@ namespace AuctionService.Controllers {
             }
         }
         
+        [Authorize(Roles = "admin")]
         [HttpPost("update")]
         public async Task<IActionResult> UpdateAuction([FromQuery] int id, [FromBody] ClientAuctionModel auction) {
             try {
                 string text = "BEGIN;UPDATE Auctions SET (title, description, start_bid, start_time, finish_time, seller_id) = " +
                               $"({auction}) WHERE id = {id} RETURNING seller_id, is_active;";
-                await AuctionCrudOperations.ChangeAuction(_pgDataBase.GetConnectionString(), text, AuctionCrudOperations.ChangeType.Update);
+                string token = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+                (string clientId, string role) = JwtParser.GetClaims(token, Authenticator.TokenType.Access);
+                
+                await AuctionCrudOperations.ChangeAuction(_pgDataBase.GetConnectionString(), AuctionCrudOperations.ChangeType.Update,
+                    text,clientId);
+                
                 return Ok("Auction was successfully updated.");
             } catch (InvalidOperationException exception) {
                 return BadRequest(exception.Message);
             }
         }
 
+        [Authorize(Roles = "admin")]
         [HttpDelete("delete")]
         public async Task<IActionResult> DeleteAuction([FromQuery] int id) {
             try {
                 string text = $"BEGIN;DELETE FROM Auctions WHERE id = {id} RETURNING seller_id, is_active;";
-                await AuctionCrudOperations.ChangeAuction(_pgDataBase.GetConnectionString(), text, AuctionCrudOperations.ChangeType.Delete);
+                string token = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+                (string clientId, string role) = JwtParser.GetClaims(token, Authenticator.TokenType.Access);
+                
+                await AuctionCrudOperations.ChangeAuction(_pgDataBase.GetConnectionString(), AuctionCrudOperations.ChangeType.Delete,
+                    text, clientId);
+                
                 return Ok("Auction was successfully deleted.");
             } catch (InvalidOperationException exception) {
                 return BadRequest(exception.Message);

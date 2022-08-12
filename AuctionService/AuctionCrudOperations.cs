@@ -29,7 +29,7 @@ namespace AuctionService {
             }
         }
         
-        public static async Task ChangeAuction(string connectionString, string commandText, ChangeType type) {
+        public static async Task ChangeAuction(string connectionString, ChangeType type, string commandText, string clientId) {
             using (var connection = new NpgsqlConnection(connectionString)) {
                 bool isActive;
                 string sellerId;
@@ -40,7 +40,7 @@ namespace AuctionService {
                     (sellerId, isActive) = ((string) reader.GetValue(0), (bool) reader.GetValue(1));
                 }
 
-                if (!isActive && sellerId == "gleb@evlakhov.com") {
+                if (!isActive && sellerId == clientId) {
                     command.CommandText = "COMMIT;";
                 } else {
                     command.CommandText = "ROLLBACK;";
