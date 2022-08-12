@@ -79,15 +79,9 @@ namespace AuthenticationServer.Controllers {
         [HttpPost("refresh")]
         public IActionResult Refresh() {
             string refreshToken = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
-            var handler = new JwtSecurityTokenHandler();
-            var claims = handler.ValidateToken(refreshToken, 
-                Authenticator.GetTokenValidationParameters(Authenticator.TokenType.Refresh),
-                out SecurityToken validatedToken).Claims.ToList();
+            (string login, string role) = JwtParser.GetClaims(refreshToken, Authenticator.TokenType.Refresh);
+            double minutesToExpiration = JwtParser.GetMinutesBeforeExpiration(refreshToken, Authenticator.TokenType.Refresh);
             
-            var minutesToExpiration = (validatedToken.ValidTo.ToUniversalTime() - DateTime.Now.ToUniversalTime()).TotalMinutes;
-            
-            string login = claims[0].Value;
-            string role = claims[1].Value;
             string accessToken = Authenticator.CreateToken(Authenticator.AccessTokenLifetime, Authenticator.TokenType.Access, login, role);
             if (minutesToExpiration < 15) {
                 refreshToken = Authenticator.CreateToken(Authenticator.RefreshTokenLifetime, Authenticator.TokenType.Refresh, login, role);
