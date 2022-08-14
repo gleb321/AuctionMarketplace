@@ -3,14 +3,14 @@ using System.Linq;
 using System.Text;
 using System.Net.Http;
 using System.Text.Json;
-using System.Data.Entity;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using AuctionService.Models;
 using AuctionService.Services;
 using AuctionMarketplaceLibrary;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 using Npgsql;
 
 namespace AuctionService.Controllers {
@@ -25,7 +25,7 @@ namespace AuctionService.Controllers {
         }
 
         [Authorize(Roles = "Admin")]
-        [HttpPost("add")]
+        [HttpPost]
         public async Task<IActionResult> AddAuction([FromBody] ClientAuctionModel auction) {
             try {
                 //TODO использовать библиотеку для построения запросов
@@ -49,8 +49,8 @@ namespace AuctionService.Controllers {
         }
         
         [Authorize(Roles = "Admin")]
-        [HttpPost("update")]
-        public async Task<IActionResult> UpdateAuction([FromQuery] int id, [FromBody] ClientAuctionModel auction) {
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateAuction(int id, [FromBody] ClientAuctionModel auction) {
             try {
                 string text = "BEGIN;UPDATE Auctions SET (title, description, start_bid, start_time, finish_time) = " +
                               $"({auction.ToUpdateString()}) WHERE id = {id} RETURNING seller_id, is_active;";
@@ -61,13 +61,17 @@ namespace AuctionService.Controllers {
                 
                 return Ok("Auction was successfully updated.");
             } catch (InvalidOperationException exception) {
+                if (exception.Message == "No row is available") {
+                    return NotFound("Auction with this id does not exist.");
+                }
+                
                 return BadRequest(exception.Message);
             }
         }
 
         [Authorize(Roles = "Admin")]
-        [HttpDelete("delete")]
-        public async Task<IActionResult> DeleteAuction([FromQuery] int id) {
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteAuction(int id) {
             try {
                 string text = $"BEGIN;DELETE FROM Auctions WHERE id = {id} RETURNING seller_id, is_active;";
                 string token = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
@@ -77,12 +81,16 @@ namespace AuctionService.Controllers {
                 
                 return Ok("Auction was successfully deleted.");
             } catch (InvalidOperationException exception) {
+                if (exception.Message == "No row is available") {
+                    return NotFound("Auction with this id does not exist.");
+                }
+                
                 return BadRequest(exception.Message);
             }
         }
 
-        [HttpGet("get/by_id")]
-        public async Task<IActionResult> GetAuction([FromQuery] int id) {
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetAuction(int id) {
             var auction = await (from dbAuction in _pgDataBase.Auctions
                 where dbAuction.Id == id
                 select dbAuction).SingleOrDefaultAsync();
@@ -93,23 +101,18 @@ namespace AuctionService.Controllers {
             
             return Ok(auction);
         }
-        
-        [HttpGet("get/all")]
-        public IEnumerable<Auction> GetAllAuctions() {
-            return from auction in _pgDataBase.Auctions select auction;
-        }
 
-        [HttpGet("get/all/active")]
-        public IEnumerable<Auction> GetAllActiveAuctions() {
+        [HttpGet("all")]
+        public IEnumerable<Auction> GetAllAuctions([FromQuery] bool onlyActive) {
             //TODO использовать butch запросы
-            return from auction in _pgDataBase.Auctions where auction.IsActive select auction;
+            return from auction in _pgDataBase.Auctions where !onlyActive || auction.IsActive select auction;
         }
 
-        [HttpPost("set/active")]
-        public async Task<IActionResult> UpdateAuctionActivityInformation([FromQuery] int id) {
+        [HttpPatch("{id}/set")]
+        public async Task<IActionResult> UpdateAuctionActivityInformation(int id, [FromQuery] bool active) {
             using (var connection = new NpgsqlConnection(_pgDataBase.GetConnectionString())) {
                 await connection.OpenAsync();
-                string text = $"BEGIN;UPDATE Auctions SET is_active = true WHERE id = {id};COMMIT;";
+                string text = $"BEGIN;UPDATE Auctions SET is_active = {active} WHERE id = {id};COMMIT;";
                 var command = new NpgsqlCommand(text, connection);
                 try {
                     command.ExecuteNonQuery();
