@@ -34,7 +34,7 @@ namespace AuctionService.Controllers {
                 Func<int, Task<HttpResponseMessage>> getResponse = id => {
                     var data = new {id, auction.SellerId, auction.StartTime, auction.FinishTime, auction.StartBid};
                     var content = new StringContent(JsonSerializer.Serialize(data), Encoding.UTF8, "application/json");
-                    string url = $"http://{Config.Host}:{Config.AuctionLiveServicePort}/auction_live/add";
+                    string url = $"http://{Config.AuctionLiveServiceHost}:{Config.AuctionLiveServicePort}/auction_live/add";
                     return _client.PostAsync(new Uri(url), content);
                 };
                 
