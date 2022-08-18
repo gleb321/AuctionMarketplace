@@ -8,12 +8,13 @@ WORKDIR /src
 COPY ["AuctionService/AuctionService.csproj", "AuctionService/"]
 RUN dotnet restore "AuctionService/AuctionService.csproj"
 COPY . ./
-RUN dotnet build "/AuctionService/AuctionService.csproj" -c Release -o /service/build
+WORKDIR AuctionService
+RUN dotnet build "AuctionService.csproj" -c Release -o /service/build
 
 FROM build AS publish
 RUN dotnet publish "AuctionService.csproj" -c Release -o /service/publish
 
 FROM base AS service
 WORKDIR /service
-COPY --from=build-env /service/publish .
+COPY --from=publish /service/publish .
 ENTRYPOINT ["dotnet", "AuctionService.dll"]

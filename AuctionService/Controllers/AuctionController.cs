@@ -24,7 +24,7 @@ namespace AuctionService.Controllers {
             _client = client;
         }
 
-        [Authorize(Roles = "Admin")]
+        // [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<IActionResult> AddAuction([FromBody] ClientAuctionModel auction) {
             try {
@@ -48,7 +48,7 @@ namespace AuctionService.Controllers {
             }
         }
         
-        [Authorize(Roles = "Admin")]
+        // [Authorize(Roles = "Admin")]
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateAuction(int id, [FromBody] ClientAuctionModel auction) {
             try {
@@ -69,7 +69,7 @@ namespace AuctionService.Controllers {
             }
         }
 
-        [Authorize(Roles = "Admin")]
+        // [Authorize(Roles = "Admin")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteAuction(int id) {
             try {

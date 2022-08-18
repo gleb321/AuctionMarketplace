@@ -1,0 +1,8 @@
+FROM postgres:14.4
+
+ENV POSTGRES_USER glebevlakhov
+ENV POSTGRES_PASSWORD psqlpass218
+
+RUN psql -c "CREATE DATABASE users;"
+
+EXPOSE 5432

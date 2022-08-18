@@ -15,11 +15,28 @@ services:
       dockerfile: AuctionService/Dockerfile
     ports:
       - 7061:7061
-  pgdatabase-service:
+  auction-live-service:
+    container_name: auction-live-service
+    build:
+      context: .
+      dockerfile: AuctionLiveService/Dockerfile
+    ports:
+      - 7019:7019
+  postgresql-auctions-service:
     image: postgres:14.4
-    container_name: pgdatabase-service
+    container_name: postgresql-auctions-service
     environment:
-      - POSTGRES_USER=auth_server
+      - POSTGRES_USER=glebevlakhov
       - POSTGRES_PASSWORD=psqlpass218
+      - POSTGRES_DB=auctions
+    ports:
+      - 5431:5432
+  postgresql-users-service:
+    image: postgres:14.4
+    container_name: postgresql-users-service
+    environment:
+      - POSTGRES_USER=glebevlakhov
+      - POSTGRES_PASSWORD=psqlpass218
+      - POSTGRES_DB=users
     ports:
       - 5432:5432

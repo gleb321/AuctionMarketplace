@@ -8,11 +8,11 @@ namespace AuthenticationServer.Services {
         public DbSet<Account>? Accounts { get; set; }
         
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) {
-            optionsBuilder.UseNpgsql($"Host={Config.DataBaseHost};" +
-                                     $"Port={Config.DataBasePort};" +
+            optionsBuilder.UseNpgsql($"Host={Config.UsersDataBaseHost};" +
+                                     $"Port={Config.UsersDataBasePort};" +
                                      $"Database={Config.AuthenticationServerDataBaseName};" +
-                                     $"User ID={Config.DataBaseUser};" +
-                                     $"Password={Config.DataBasePassword};");
+                                     $"User ID={Config.UsersDataBaseUser};" +
+                                     $"Password={Config.UsersDataBasePassword};");
         }
     }
 }

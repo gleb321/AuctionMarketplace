@@ -5,15 +5,16 @@ ENV ASPNETCORE_URLS=http://+:7019
 
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 WORKDIR /src
-COPY ["AuctionLiveService/AuctionService.csproj", "AuctionLiveService/"]
+COPY ["AuctionLiveService/AuctionLiveService.csproj", "AuctionLiveService/"]
 RUN dotnet restore "AuctionLiveService/AuctionLiveService.csproj"
 COPY . ./
-RUN dotnet build "/AuctionLiveService/AuctionLiveService.csproj" -c Release -o /service/build
+WORKDIR AuctionLiveService
+RUN dotnet build "AuctionLiveService.csproj" -c Release -o /service/build
 
 FROM build AS publish
 RUN dotnet publish "AuctionLiveService.csproj" -c Release -o /service/publish
 
 FROM base AS service
 WORKDIR /service
-COPY --from=build-env /service/publish .
+COPY --from=publish /service/publish .
 ENTRYPOINT ["dotnet", "AuctionLiveService.dll"]
