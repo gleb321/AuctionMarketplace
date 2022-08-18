@@ -2,15 +2,22 @@ version: "3.5"
 
 services:
   auth-service:
-    container_name: authserver
+    container_name: auth-service
     build: 
       context: .
       dockerfile: AuthenticationServer/Dockerfile
     ports:
       - 7137:7137
+  auction-service:
+    container_name: auction-service
+    build:
+      context: .
+      dockerfile: AuctionService/Dockerfile
+    ports:
+      - 7061:7061
   pgdatabase-service:
     image: postgres:14.4
-    container_name: pgdatabase
+    container_name: pgdatabase-service
     environment:
       - POSTGRES_USER=auth_server
       - POSTGRES_PASSWORD=psqlpass218
