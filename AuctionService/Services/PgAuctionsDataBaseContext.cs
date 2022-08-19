@@ -12,11 +12,11 @@ namespace AuctionService.Services {
 
         public string GetConnectionString() {
             return 
-                $"Host={Config.AuctionsDataBaseHost};" +
-                $"Port={Config.AuctionsDataBasePort};" +
+                $"Host={Config.AuctionServiceDataBaseHost};" +
+                $"Port={Config.AuctionServiceDataBasePort};" +
                 $"Database={Config.AuctionServiceDataBaseName};" +
-                $"User ID={Config.AuctionsDataBaseUser};" +
-                $"Password={Config.AuctionsDataBasePassword};";
+                $"User ID={Config.AuctionServiceDataBaseUser};" +
+                $"Password={Config.AuctionServiceDataBasePassword};";
         }
     }
 }
