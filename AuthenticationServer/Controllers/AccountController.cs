@@ -34,6 +34,7 @@ namespace AuthenticationServer.Controllers {
                 await Task.WhenAll(
                     pgDataBaseContexts[0].SaveChangesAsync(), pgDataBaseContexts[1].SaveChangesAsync());
             } catch (DbUpdateException exception) {
+                //TODO Детальнее проработать exception
                 return BadRequest("User with such a login already exists.");
             }
 
