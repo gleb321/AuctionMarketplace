@@ -31,6 +31,8 @@ services:
       - POSTGRES_DB=auction
     ports:
       - 5432:5432
+    volumes: 
+      - ./postgresql-auction-service-data:/var/lib/postgresql/data
   postgresql-auth-service:
     image: postgres:14.4
     container_name: postgresql-auth-service
@@ -41,3 +43,5 @@ services:
       - PGPORT=5431
     ports:
       - 5431:5431
+    volumes: 
+      - ./postgresql-auth-service-data:/var/lib/postgresql/data
