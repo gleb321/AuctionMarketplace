@@ -26,6 +26,11 @@ namespace AuctionService {
                 app.UseDeveloperExceptionPage();
             }
             
+            //TODO нормально настроить CORS
+            app.UseCors(builder => {
+                builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
+            });
+            
             AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
             app.UseRouting();
             
