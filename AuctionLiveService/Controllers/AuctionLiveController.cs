@@ -2,29 +2,27 @@ using System;
 using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Timers;
 using Microsoft.AspNetCore.Mvc;
 using AuctionLiveService.Models;
 using AuctionLiveService.Services;
 
 namespace AuctionLiveService.Controllers {
+    [ApiController]
     [Route("/auction_live/")]
     public class AuctionLiveController: Controller {
-        private AuctionManagementService _auctionManagementService;
+        private readonly AuctionAlertService _auctionAlertService;
+        private readonly AuctionManagementService _managementService;
 
-        public AuctionLiveController(AuctionManagementService auctionManagementService) {
-            _auctionManagementService = auctionManagementService;
+        public AuctionLiveController(AuctionManagementService managementService,  AuctionAlertService alertService) {
+            _managementService = managementService;
+            _auctionAlertService = alertService;
         }
         
         [HttpPost("add")]
-        public IActionResult Add([FromBody] InitialModel auction) {
-            try {
-                _auctionManagementService.Add(new Auction(auction.Id, auction.SellerId, auction.StartBid,
-                    DateTime.ParseExact(auction.StartTime, "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture),
-                    DateTime.ParseExact(auction.FinishTime, "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture)));
-            } catch (InvalidOperationException invalidOperationException) {
-                return BadRequest(invalidOperationException.Message);
-            }
-            
+        public IActionResult Add([FromBody] Auction auction) {
+            _managementService.Add(auction.Id, auction.StartTime, true, _auctionAlertService);
+            _managementService.Add(auction.Id, auction.FinishTime, false, _auctionAlertService);
             
             return Ok("Auction was successfully added.");
         }

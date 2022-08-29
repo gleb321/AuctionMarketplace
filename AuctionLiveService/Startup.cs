@@ -1,3 +1,4 @@
+using AuctionLiveService.Hubs;
 using AuctionLiveService.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -9,7 +10,10 @@ namespace AuctionLiveService {
         public void ConfigureServices(IServiceCollection services) {
             services.AddControllers();
             services.AddSignalR();
+            services.AddSingleton<AuctionAlertService>();
             services.AddSingleton<AuctionManagementService>();
+            services.AddSingleton<TimerService>(provider => new TimerService(1,
+                provider.GetRequiredService<AuctionManagementService>().AuctionTimeEvents));
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env) {

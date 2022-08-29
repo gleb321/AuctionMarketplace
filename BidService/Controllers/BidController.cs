@@ -24,7 +24,7 @@ namespace BidService.Controllers {
                 return BadRequest(argumentException.Message);
             }
 
-            return Ok("Bid was successfully made.");
+            return Ok("Bid was successfully placed.");
         }
 
         [HttpPost("add")]
@@ -38,10 +38,12 @@ namespace BidService.Controllers {
             return Ok("Auction was successfully added.");
         }
 
-        [HttpPost("set/active")]
-        public IActionResult ActivateAuction(int id) {
+        [HttpPost("set")]
+        public IActionResult SetAuctionActiveStatus([FromQuery] int id, [FromQuery] bool activityStatus) {
             try {
-                _bidPlacer.SetAuctionAvailableForBids(id);
+                if (activityStatus) {
+                    _bidPlacer.SetAuctionAvailableForBids(id);
+                }
             } catch (InvalidOperationException exception) {
                 return NotFound(exception.Message);
             }

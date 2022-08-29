@@ -3,7 +3,7 @@ using System.Globalization;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
 
-namespace AuctionLiveService {
+namespace AuctionLiveService.Hubs {
     public class AuctionRoomsHub: Hub {
         public async Task SendBidValueAsync(int auctionId, decimal value) {
             await Clients.Group(auctionId.ToString()).SendAsync("BidValueChanged", value.ToString(CultureInfo.InvariantCulture));

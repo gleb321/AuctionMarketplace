@@ -10,14 +10,14 @@ using AuctionService.Services;
 using AuctionMarketplaceLibrary;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Authorization;
 using Npgsql;
 
 namespace AuctionService.Controllers {
+    [ApiController]
     [Route("/auction/")]
     public class AuctionController: Controller {
-        private PgAuctionsDataBaseContext _pgDataBase;
-        private HttpClient _client;
+        private readonly PgAuctionsDataBaseContext _pgDataBase;
+        private readonly HttpClient _client;
         
         public AuctionController(PgAuctionsDataBaseContext pgDataBase, HttpClient client) {
             _pgDataBase = pgDataBase;
@@ -109,10 +109,10 @@ namespace AuctionService.Controllers {
         }
 
         [HttpPatch("{id}/set")]
-        public async Task<IActionResult> UpdateAuctionActivityInformation(int id, [FromQuery] bool active) {
-            using (var connection = new NpgsqlConnection(_pgDataBase.GetConnectionString())) {
+        public async Task<IActionResult> UpdateAuctionActivityInformation(int id, [FromQuery] bool activityStatus) {
+            await using (var connection = new NpgsqlConnection(_pgDataBase.GetConnectionString())) {
                 await connection.OpenAsync();
-                string text = $"BEGIN;UPDATE Auctions SET is_active = {active} WHERE id = {id};COMMIT;";
+                string text = $"BEGIN;UPDATE Auctions SET is_active = {activityStatus} WHERE id = {id};COMMIT;";
                 var command = new NpgsqlCommand(text, connection);
                 try {
                     command.ExecuteNonQuery();

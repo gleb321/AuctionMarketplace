@@ -1,6 +1,7 @@
 namespace AuctionMarketplaceLibrary {
      public static class Config {
          //Hosts
+         public const string BidServiceHost = "bid-service";
          public const string AuctionServiceHost = "auction-service";
          public const string AuthenticationServerHost = "auth-service";
          public const string AuctionLiveServiceHost = "auction-live-service";
@@ -18,6 +19,7 @@ namespace AuctionMarketplaceLibrary {
          public const string AuthenticationServerDataBaseUser = "auth_service";
          public const string AuthenticationServerDataBasePassword = "authpsqlpass218";
          //Ports
+         public const ushort BidServicePort = 7267;
          public const ushort AuctionServicePort = 7061;
          public const ushort AuctionLiveServicePort = 7019;
          public const ushort AuthenticationServerPort = 7137;

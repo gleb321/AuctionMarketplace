@@ -1,21 +1,18 @@
 using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace AuctionLiveService.Models {
     public class Auction {
-        public Auction(int id, string sellerId, decimal bid, DateTime startTime, DateTime finishTime) {
-            (Id, SellerId, StartTime, FinishTime, CurrentBid) = (id, sellerId, startTime, finishTime, bid);
-            IsActive = startTime <= DateTime.Now && finishTime > DateTime.Now;
-        }
-        
+        [Range(1, Int32.MaxValue)]
         public int Id { get; set; }
+        [Required]
+        [EmailAddress]
         public string SellerId { get; set; }
-        public DateTime StartTime { get; set; }
-        public DateTime FinishTime { get; set; }
-        public decimal CurrentBid { get; set; }
-        public bool IsActive { get; set; }
-
-        public override string ToString() {
-            return $"{Id} {SellerId} {StartTime} - {FinishTime} {IsActive}";
-        }
+        [Required]
+        public string StartTime { get; set; }
+        [Required]
+        public string FinishTime { get; set; }
+        [Range(1, 1000000)]
+        public decimal StartPrice { get; set; }
     }
 }
