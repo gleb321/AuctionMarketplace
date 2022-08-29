@@ -1,5 +1,3 @@
-using System;
-using System.Net.Http;
 using AuctionLiveService.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -10,6 +8,7 @@ namespace AuctionLiveService {
     public class Startup {
         public void ConfigureServices(IServiceCollection services) {
             services.AddControllers();
+            services.AddSignalR();
             services.AddSingleton<AuctionManagementService>();
         }
 
@@ -17,11 +16,11 @@ namespace AuctionLiveService {
             if (env.IsDevelopment()) {
                 app.UseDeveloperExceptionPage();
             }
-
             
             app.UseRouting();
             app.UseEndpoints(endpoints => {
                  endpoints.MapControllers();
+                 endpoints.MapHub<AuctionRoomsHub>("/auction_live/connect");
             });
         }
     }

@@ -5,6 +5,8 @@ using BidService.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BidService.Controllers {
+    [ApiController]
+    [Route("/bid/")]
     public class BidController: Controller {
         private readonly BidPlacerService _bidPlacer;
         
@@ -12,8 +14,8 @@ namespace BidService.Controllers {
             _bidPlacer = bidPlacer;
         }
         
-        [HttpPost("make_bid")]
-        public async Task<IActionResult> MakeBid([FromQuery] Bid bid) {
+        [HttpPost("place")]
+        public async Task<IActionResult> PlaceBid([FromBody] Bid bid) {
             try {
                 await _bidPlacer.PlaceBid(bid);
             } catch (InvalidOperationException invalidOperationException) {
@@ -23,6 +25,28 @@ namespace BidService.Controllers {
             }
 
             return Ok("Bid was successfully made.");
+        }
+
+        [HttpPost("add")]
+        public IActionResult AddAuction([FromBody] Auction auction) {
+            try {
+                _bidPlacer.AddAuctionForBids(auction);
+            } catch (InvalidOperationException exception) {
+                return BadRequest(exception.Message);
+            }
+
+            return Ok("Auction was successfully added.");
+        }
+
+        [HttpPost("set/active")]
+        public IActionResult ActivateAuction(int id) {
+            try {
+                _bidPlacer.SetAuctionAvailableForBids(id);
+            } catch (InvalidOperationException exception) {
+                return NotFound(exception.Message);
+            }
+            
+            return Ok("Auction was successfully activated");
         }
     }
 }

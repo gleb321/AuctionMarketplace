@@ -1,10 +1,11 @@
+using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace BidService.Models {
     public class Bid {
-        [Required]
+        [Range(1, Int32.MaxValue)]
         public int AuctionId { get; set; }
-        [Required]
+        [Range(1, 10000)]
         public decimal Value { get; set; }
     }
 }
