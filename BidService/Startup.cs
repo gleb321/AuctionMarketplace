@@ -1,16 +1,14 @@
-using System;
-using System.Net.Http;
-using AuctionLiveService.Services;
+using BidService.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
-namespace AuctionLiveService {
+namespace BidService {
     public class Startup {
         public void ConfigureServices(IServiceCollection services) {
             services.AddControllers();
-            services.AddSingleton<AuctionManagementService>();
+            services.AddSingleton<BidPlacerService>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env) {

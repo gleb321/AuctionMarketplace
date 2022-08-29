@@ -1,5 +1,5 @@
-using Microsoft.EntityFrameworkCore;
 using AuctionMarketplaceLibrary;
+using Microsoft.EntityFrameworkCore;
 using AuthenticationServer.Models;
 
 namespace AuthenticationServer.Services {

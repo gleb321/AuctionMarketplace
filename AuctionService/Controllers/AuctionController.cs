@@ -57,7 +57,7 @@ namespace AuctionService.Controllers {
                 string token = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
                 (string clientId, string role) = JwtParser.GetClaims(token, Authenticator.TokenType.Access);
                 await AuctionCrudOperations.ChangeAuction(_pgDataBase.GetConnectionString(), AuctionCrudOperations.ChangeType.Update,
-                    text,clientId);
+                    text, clientId);
                 
                 return Ok("Auction was successfully updated.");
             } catch (InvalidOperationException exception) {

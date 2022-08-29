@@ -2,20 +2,19 @@ using System;
 using System.Collections.Concurrent;
 using System.Linq;
 using System.Threading.Tasks;
-using AuctionLiveService.Models;
+using BidService.Models;
 
-namespace AuctionLiveService.Services {
-    public class BidService {
+namespace BidService.Services {
+    public class BidPlacerService {
         private ConcurrentDictionary<int, Auction> _auctions;
         private ConcurrentDictionary<int, ConcurrentQueue<Bid>> _auctionQueues;
 
-        public BidService(ConcurrentDictionary<int, Auction> auctions,
-            ConcurrentDictionary<int, ConcurrentQueue<Bid>> auctionQueues) {
-            _auctions = auctions;
-            _auctionQueues = auctionQueues;
+        public BidPlacerService() {
+            _auctions = new ConcurrentDictionary<int, Auction>();
+            _auctionQueues = new ConcurrentDictionary<int, ConcurrentQueue<Bid>>();
         }
 
-        public Task MakeBid(Bid bid) {
+        public Task PlaceBid(Bid bid) {
             return new Task(() => {
                 var queue = _auctionQueues[bid.AuctionId];
                 queue.Enqueue(bid);
@@ -29,6 +28,8 @@ namespace AuctionLiveService.Services {
                         } else {
                             throw new ArgumentException("New bid value must be more than current bid value.");
                         }
+                        
+                        
                     } else {
                         throw new InvalidOperationException("This auction has not stated yet.");
                     }

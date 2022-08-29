@@ -4,18 +4,15 @@ using AuctionLiveService.Models;
 
 namespace AuctionLiveService.Services {
     public class AuctionManagementService {
-        public readonly ConcurrentDictionary<int, Auction> Auctions;
-        public readonly ConcurrentDictionary<int, ConcurrentQueue<Bid>> AuctionQueues;
+        private readonly ConcurrentDictionary<int, Auction> _auctions;
 
         public AuctionManagementService() {
-            Auctions = new ConcurrentDictionary<int, Auction>();
-            AuctionQueues = new ConcurrentDictionary<int, ConcurrentQueue<Bid>>();
+            _auctions = new ConcurrentDictionary<int, Auction>();
         }
 
         public void Add(Auction auction) {
-            if (!Auctions.ContainsKey(auction.Id)) {
-                Auctions.TryAdd(auction.Id, auction);
-                AuctionQueues.TryAdd(auction.Id, new ConcurrentQueue<Bid>());
+            if (!_auctions.ContainsKey(auction.Id)) {
+                _auctions.TryAdd(auction.Id, auction);
             } else {
                 throw new InvalidOperationException("Auction with this id already exists.");
             }

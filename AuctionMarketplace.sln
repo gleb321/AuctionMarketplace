@@ -8,6 +8,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuctionMarketplaceLibrary",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuctionLiveService", "AuctionLiveService\AuctionLiveService.csproj", "{EB70AF97-0AB6-41A4-BC4A-2D47315DD92A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BidService", "BidService\BidService.csproj", "{F401FE7D-7584-4F86-BF54-D9443008516F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -30,5 +32,9 @@ Global
 		{EB70AF97-0AB6-41A4-BC4A-2D47315DD92A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EB70AF97-0AB6-41A4-BC4A-2D47315DD92A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EB70AF97-0AB6-41A4-BC4A-2D47315DD92A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F401FE7D-7584-4F86-BF54-D9443008516F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F401FE7D-7584-4F86-BF54-D9443008516F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F401FE7D-7584-4F86-BF54-D9443008516F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F401FE7D-7584-4F86-BF54-D9443008516F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
