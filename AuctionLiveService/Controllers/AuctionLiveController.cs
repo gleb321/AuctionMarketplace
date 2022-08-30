@@ -16,11 +16,13 @@ namespace AuctionLiveService.Controllers {
         private readonly HttpClient _client;
         private readonly AuctionAlertService _auctionAlertService;
         private readonly AuctionManagementService _managementService;
+        private readonly TimerService _timerService;
 
-        public AuctionLiveController(AuctionManagementService managementService,  AuctionAlertService alertService, HttpClient client) {
+        public AuctionLiveController(AuctionManagementService managementService,  AuctionAlertService alertService, HttpClient client, TimerService timerService) {
             _managementService = managementService;
             _auctionAlertService = alertService;
             _client = client;
+            _timerService = timerService;
         }
         
         [HttpPost("add")]
@@ -31,10 +33,10 @@ namespace AuctionLiveService.Controllers {
             //TODO Подумать об использовании разных http клиентов
             var data = new {auction.Id, auction.SellerId, CurrentBid = auction.StartPrice};
             var content = new StringContent(JsonSerializer.Serialize(data), Encoding.UTF8, "application/json");
-            var url = $"http://{Config.BidServiceHost}:{Config.BidServiceHost}/add";
+            var url = $"http://{Config.BidServiceHost}:{Config.BidServicePort}/bid/add";
             var response = await _client.PostAsync(new Uri(url), content);
             if (response.StatusCode != HttpStatusCode.OK) {
-                return BadRequest("Trouble adding auction to Bid service.");
+                return BadRequest("Trouble adding auction to bid service.");
             }
             
             return Ok("Auction was successfully added.");

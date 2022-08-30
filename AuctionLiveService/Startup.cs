@@ -1,3 +1,4 @@
+using System.Net.Http;
 using AuctionLiveService.Hubs;
 using AuctionLiveService.Services;
 using Microsoft.AspNetCore.Builder;
@@ -10,6 +11,7 @@ namespace AuctionLiveService {
         public void ConfigureServices(IServiceCollection services) {
             services.AddControllers();
             services.AddSignalR();
+            services.AddSingleton<HttpClient>();
             services.AddSingleton<AuctionAlertService>();
             services.AddSingleton<AuctionManagementService>();
             services.AddSingleton<TimerService>(provider => new TimerService(1,

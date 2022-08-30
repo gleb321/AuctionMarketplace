@@ -36,22 +36,26 @@ namespace BidService.Services {
         }
 
         public async Task PlaceBid(Bid bid) {
+            if (!_auctions.ContainsKey(bid.AuctionId)) {
+                throw new ArgumentException("Auction with this id does not exist.");
+            }
+            
+            if (!_auctions[bid.AuctionId].IsActive) {
+                throw new InvalidOperationException("Auction with this id has not started yet.");
+            }
+            
             var queue = _auctionQueues[bid.AuctionId];
             queue.Enqueue(bid);
             while (!queue.First().Equals(bid)) {}
 
             lock (_auctions[bid.AuctionId]) {
                 queue.TryDequeue(out var unused);
-                if (_auctions[bid.AuctionId].IsActive) {
-                    if (bid.Value > _auctions[bid.AuctionId].CurrentBid) {
-                        _auctions[bid.AuctionId].CurrentBid = bid.Value;
-                    } else {
-                        throw new ArgumentException("New bid value must be more than current bid value.");
-                    }
-                    
+                if (bid.Value > _auctions[bid.AuctionId].CurrentBid) {
+                    _auctions[bid.AuctionId].CurrentBid = bid.Value;
                 } else {
-                    throw new InvalidOperationException("This auction has not stated yet.");
+                    throw new InvalidOperationException("New bid value must be more than current bid value.");
                 }
+                    
             }
 
             if (_connection.State == HubConnectionState.Disconnected) {

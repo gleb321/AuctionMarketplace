@@ -19,9 +19,9 @@ namespace BidService.Controllers {
             try {
                 await _bidPlacer.PlaceBid(bid);
             } catch (InvalidOperationException invalidOperationException) {
-                return BadRequest(invalidOperationException.Message);
+                return Forbid(invalidOperationException.Message);
             } catch (ArgumentException argumentException) {
-                return BadRequest(argumentException.Message);
+                return NotFound(argumentException.Message);
             }
 
             return Ok("Bid was successfully placed.");

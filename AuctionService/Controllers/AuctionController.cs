@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using AuctionService.Models;
 using AuctionService.Services;
 using AuctionMarketplaceLibrary;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Npgsql;
@@ -24,7 +25,7 @@ namespace AuctionService.Controllers {
             _client = client;
         }
 
-        // [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<IActionResult> AddAuction([FromBody] ClientAuctionModel auction) {
             try {
@@ -32,7 +33,7 @@ namespace AuctionService.Controllers {
                 string text = "BEGIN;INSERT INTO Auctions (title, description, start_bid, start_time, finish_time, seller_id) " +
                               $"VALUES ({auction.ToInsertString()}) RETURNING id;";
                 Func<int, Task<HttpResponseMessage>> getResponse = id => {
-                    var data = new {id, auction.SellerId, auction.StartTime, auction.FinishTime, auction.StartBid};
+                    var data = new {id, auction.SellerId, auction.StartTime, auction.FinishTime, StartPrice = auction.StartBid};
                     var content = new StringContent(JsonSerializer.Serialize(data), Encoding.UTF8, "application/json");
                     string url = $"http://{Config.AuctionLiveServiceHost}:{Config.AuctionLiveServicePort}/auction_live/add";
                     return _client.PostAsync(new Uri(url), content);
@@ -40,7 +41,7 @@ namespace AuctionService.Controllers {
                 
                 if (await AuctionCrudOperations.TryCreateAuction(_pgDataBase.GetConnectionString(), text, getResponse)) {
                     return Ok("Auction was successfully added.");
-                } 
+                }
                 
                 return BadRequest("Auction was not added.");
             } catch {
@@ -48,7 +49,7 @@ namespace AuctionService.Controllers {
             }
         }
         
-        // [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateAuction(int id, [FromBody] ClientAuctionModel auction) {
             try {
@@ -69,7 +70,7 @@ namespace AuctionService.Controllers {
             }
         }
 
-        // [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteAuction(int id) {
             try {

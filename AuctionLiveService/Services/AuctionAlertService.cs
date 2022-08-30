@@ -11,8 +11,8 @@ namespace AuctionLiveService.Services {
 
         public AuctionAlertService() {
             _client = new HttpClient();
-            _bidServiceUrl = $"http://{Config.BidServiceHost}:{Config.BidServiceHost}/bid/set";
-            _auctionServiceUrl = $"http://{Config.AuctionServiceHost}:{Config.AuctionServicePort}";
+            _bidServiceUrl = $"http://{Config.BidServiceHost}:{Config.BidServicePort}/bid/set";
+            _auctionServiceUrl = $"http://{Config.AuctionServiceHost}:{Config.AuctionServicePort}/auction";
         }
 
         public async Task SendAuctionActivationAlert(int id, bool status) {
