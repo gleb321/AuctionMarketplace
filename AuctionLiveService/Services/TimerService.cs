@@ -28,6 +28,7 @@ namespace AuctionLiveService.Services {
             string time = DateTime.Now.ToString("yyyy-MM-dd HH:mm");
             Console.WriteLine(time);
             if (_auctionTimeEvents.ContainsKey(time)) {
+                //TODO Разобраться с exception(сейчас обрабатывается только последний метод в Invokation list)
                 await _auctionTimeEvents[time].Invoke();
                 _auctionTimeEvents.Remove(time, out var unused);
             }
