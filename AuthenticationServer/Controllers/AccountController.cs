@@ -8,7 +8,7 @@ using AuthenticationServer.Services;
 using AuctionMarketplaceLibrary;
 
 namespace AuthenticationServer.Controllers {
-    [Controller]
+    [ApiController]
     [Route("/account/")]
     public class AccountController: Controller {
         private readonly IDbContextFactory<PgUsersDataBaseContext> _pgDataBaseFactory;
@@ -16,8 +16,7 @@ namespace AuthenticationServer.Controllers {
         public AccountController(IDbContextFactory<PgUsersDataBaseContext> pgDataBaseFactory) {
             _pgDataBaseFactory = pgDataBaseFactory;
         }
-
-        //TODO Улучшить асинхронность
+        
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegistrationModel registrationAccount) {
             User user = new User(registrationAccount.Email, registrationAccount.Name, registrationAccount.Surname);
@@ -26,9 +25,9 @@ namespace AuthenticationServer.Controllers {
 
             var pgDataBaseContexts = await Task.WhenAll(
                 _pgDataBaseFactory.CreateDbContextAsync(), _pgDataBaseFactory.CreateDbContextAsync());
-            
-            await pgDataBaseContexts[0].Users.AddAsync(user);
-            await pgDataBaseContexts[1].Accounts.AddAsync(account);
+
+            await Task.WhenAll(
+                pgDataBaseContexts[0].Users.AddAsync(user).AsTask(), pgDataBaseContexts[1].Accounts.AddAsync(account).AsTask());
 
             try {
                 await Task.WhenAll(
@@ -43,10 +42,6 @@ namespace AuthenticationServer.Controllers {
         
         [HttpPost("auth")]
         public async Task<IActionResult> Authorise([FromBody] AuthenticationModel authenticationAccount) {
-            if (authenticationAccount?.Login is null || authenticationAccount.Password is null) {
-                return BadRequest("One or more fields are empty.");
-            }
-            
             Account? databaseAccount;
             using (var pgDataBase = await _pgDataBaseFactory.CreateDbContextAsync()) {
                 databaseAccount = await (from account in pgDataBase.Accounts
@@ -89,11 +84,6 @@ namespace AuthenticationServer.Controllers {
                  AccessToken = accessToken,
                  RefreshToken = refreshToken
             });
-        }
-
-        [HttpGet("hello")]
-        public IActionResult Hello() {
-            return Ok("Hello world");
         }
     }
 }
