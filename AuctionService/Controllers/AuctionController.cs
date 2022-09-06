@@ -41,11 +41,11 @@ namespace AuctionService.Controllers {
                               "RETURNING id;";
                 
                 var command = new NpgsqlCommand(text);
-                command.FillStringParameters(new []{auction.Title, auction.Description, auction.SellerId});
-                command.FillDateTimeParameters(new [] {
+                command.FillParameters(new []{auction.Title, auction.Description, auction.SellerId}, "str");
+                command.FillParameters(new [] {
                     DateTime.ParseExact(auction.StartTime, "yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture),
                     DateTime.ParseExact(auction.FinishTime, "yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture)
-                });
+                }, "dt");
                 
                 if (await AuctionCrudOperations.TryCreateAuction(_pgDataBase.GetConnectionString(), command, GetResponse)) {
                     return Ok("Auction was successfully added.");
@@ -53,7 +53,6 @@ namespace AuctionService.Controllers {
                 
                 return BadRequest("Auction was not added.");
             } catch (Exception exception) {
-                Console.WriteLine(exception.Message);
                 return BadRequest("Trouble creating new auction.");
             }
             
@@ -79,11 +78,11 @@ namespace AuctionService.Controllers {
                               "RETURNING seller_id, is_active;";
                 
                 var command = new NpgsqlCommand(text);
-                command.FillStringParameters(new []{auction.Title, auction.Description});
-                command.FillDateTimeParameters(new [] {
+                command.FillParameters(new []{auction.Title, auction.Description}, "str");
+                command.FillParameters(new [] {
                     DateTime.ParseExact(auction.StartTime, "yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture),
                     DateTime.ParseExact(auction.FinishTime, "yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture)
-                });
+                }, "dt");
                 
                 await AuctionCrudOperations.ChangeAuction(
                     _pgDataBase.GetConnectionString(), AuctionCrudOperations.ChangeType.Update, command, clientId);

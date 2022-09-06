@@ -16,15 +16,12 @@ namespace AuthenticationServer.Models {
 
         [Key] 
         [Column("login")]
-        [Required]
-        public string? Login { get; set; }
+        public string Login { get; set; }
 
         [Column("password")]
-        [Required]
-        public string? Password { get; set; }
+        public string Password { get; set; }
 
         [Column("role")]
-        [Required]
         public Role UserRole { get; set; }
         
         public override string ToString() {

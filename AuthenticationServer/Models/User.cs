@@ -12,7 +12,6 @@ namespace AuthenticationServer.Models {
         
         [Key]
         [Column("email")]
-        [Required]
         public string? Email { get; set; }
         [Column("name")]
         [Required]

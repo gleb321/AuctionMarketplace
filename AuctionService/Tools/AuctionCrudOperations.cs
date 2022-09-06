@@ -2,7 +2,6 @@ using System;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
-using AuctionService.Models;
 using Npgsql;
 
 namespace AuctionService.Tools {
