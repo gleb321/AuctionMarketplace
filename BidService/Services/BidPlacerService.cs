@@ -25,10 +25,18 @@ namespace BidService.Services {
             }
         }
         
-        public void SetAuctionAvailableForBids(int id) {
+        public void StartAuctionForBids(int id) {
             if (_auctions.ContainsKey(id)) {
                 _auctionQueues.TryAdd(id, new ConcurrentQueue<Bid>());
                 _auctions[id].IsActive = true;
+            } else {
+                throw new InvalidOperationException("Auction with this id does not exist.");
+            }
+        }
+
+        public void FinishAuctionForBids(int id) {
+            if (_auctions.ContainsKey(id)) {
+                _auctions[id].IsActive = false;
             } else {
                 throw new InvalidOperationException("Auction with this id does not exist.");
             }
@@ -40,7 +48,7 @@ namespace BidService.Services {
             }
             
             if (!_auctions[bid.AuctionId].IsActive) {
-                throw new InvalidOperationException("Auction with this id has not started yet.");
+                throw new InvalidOperationException("Auction with this id is not active right now.");
             }
             
             var queue = _auctionQueues[bid.AuctionId];

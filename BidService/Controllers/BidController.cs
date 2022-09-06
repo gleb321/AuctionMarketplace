@@ -42,13 +42,15 @@ namespace BidService.Controllers {
         public IActionResult SetAuctionActiveStatus([FromQuery] int id, [FromQuery] bool activityStatus) {
             try {
                 if (activityStatus) {
-                    _bidPlacer.SetAuctionAvailableForBids(id);
+                    _bidPlacer.StartAuctionForBids(id);
+                } else {
+                    _bidPlacer.FinishAuctionForBids(id);
                 }
             } catch (InvalidOperationException exception) {
                 return NotFound(exception.Message);
             }
             
-            return Ok("Auction was successfully activated");
+            return Ok($"Auction was successfully {(activityStatus ? "started" : "finished")} for bids.");
         }
     }
 }
