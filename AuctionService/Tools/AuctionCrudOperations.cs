@@ -2,19 +2,20 @@ using System;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using AuctionService.Models;
 using Npgsql;
 
-namespace AuctionService {
+namespace AuctionService.Tools {
     public static class AuctionCrudOperations {
         public enum ChangeType {
             Update, 
             Delete
         }
         
-        public static async Task<bool> TryCreateAuction(string connectionString, string commandText, Func<int, Task<HttpResponseMessage>> getResponse) {
+        public static async Task<bool> TryCreateAuction(string connectionString, NpgsqlCommand command, Func<int, Task<HttpResponseMessage>> getResponse) {
             HttpStatusCode statusCode;
             using (var connection = new NpgsqlConnection(connectionString)) {
-                var command = new NpgsqlCommand(commandText, connection);
+                command.Connection = connection;
                 await connection.OpenAsync();
                 await using (var reader = await command.ExecuteReaderAsync()) {
                     await reader.ReadAsync();
@@ -28,12 +29,12 @@ namespace AuctionService {
             return statusCode == HttpStatusCode.OK;
         }
         
-        public static async Task ChangeAuction(string connectionString, ChangeType type, string commandText, string clientId) {
+        public static async Task ChangeAuction(string connectionString, ChangeType type, NpgsqlCommand command, string clientId) {
             bool isActive;
             string sellerId;
             using (var connection = new NpgsqlConnection(connectionString)) {
+                command.Connection = connection;
                 await connection.OpenAsync();
-                var command = new NpgsqlCommand(commandText, connection);
                 await using (var reader = await command.ExecuteReaderAsync()) {
                     await reader.ReadAsync();
                     (sellerId, isActive) = (reader.GetString(0), reader.GetBoolean(1));
