@@ -12,10 +12,7 @@ namespace AuctionLiveService {
             services.AddControllers();
             services.AddSignalR();
             services.AddSingleton<HttpClient>();
-            services.AddSingleton<AuctionAlertService>();
-            services.AddSingleton<AuctionManagementService>();
-            services.AddSingleton<TimerService>(provider => new TimerService(1,
-                provider.GetRequiredService<AuctionManagementService>().AuctionTimeEvents));
+            services.AddSingleton<AuctionManagementService>(new AuctionManagementService(new AuctionAlertService(), 1));
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env) {

@@ -40,7 +40,7 @@ namespace AuctionService {
                 }
                 
                 if (!isActive && sellerId == clientId) {
-                        command.CommandText = "COMMIT;";
+                    command.CommandText = "COMMIT;";
                 } else {
                     command.CommandText = "ROLLBACK;";
                 }

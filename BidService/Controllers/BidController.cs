@@ -19,7 +19,7 @@ namespace BidService.Controllers {
             try {
                 await _bidPlacer.PlaceBid(bid);
             } catch (InvalidOperationException invalidOperationException) {
-                return Forbid(invalidOperationException.Message);
+                return BadRequest(invalidOperationException.Message);
             } catch (ArgumentException argumentException) {
                 return NotFound(argumentException.Message);
             }

@@ -14,21 +14,17 @@ namespace AuctionLiveService.Controllers {
     [Route("/auction_live/")]
     public class AuctionLiveController: Controller {
         private readonly HttpClient _client;
-        private readonly AuctionAlertService _auctionAlertService;
-        private readonly AuctionManagementService _managementService;
-        private readonly TimerService _timerService;
+        private readonly AuctionManagementService _auctionManagementService;
 
-        public AuctionLiveController(AuctionManagementService managementService,  AuctionAlertService alertService, HttpClient client, TimerService timerService) {
-            _managementService = managementService;
-            _auctionAlertService = alertService;
+        public AuctionLiveController(HttpClient client, AuctionManagementService auctionManagementService) {
             _client = client;
-            _timerService = timerService;
+            _auctionManagementService = auctionManagementService;
         }
         
         [HttpPost("add")]
         public async Task<IActionResult> Add([FromBody] Auction auction) {
-            _managementService.Add(auction.Id, auction.StartTime, true, _auctionAlertService);
-            _managementService.Add(auction.Id, auction.FinishTime, false, _auctionAlertService);
+            _auctionManagementService.Add(auction.Id, auction.StartTime, true);
+            _auctionManagementService.Add(auction.Id, auction.FinishTime, false);
             
             //TODO Подумать об использовании разных http клиентов
             var data = new {auction.Id, auction.SellerId, CurrentBid = auction.StartPrice};
