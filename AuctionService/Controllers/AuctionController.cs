@@ -28,7 +28,7 @@ namespace AuctionService.Controllers {
         [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<IActionResult> AddAuction([FromBody] ClientAuctionModel auction) {
-            try {
+            // try {
                 string token = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
                 (string clientId, string role) = JwtParser.GetClaims(token, Authenticator.TokenType.Access);
                 auction.SellerId = clientId;
@@ -49,9 +49,10 @@ namespace AuctionService.Controllers {
                 }
                 
                 return BadRequest("Auction was not added.");
-            } catch {
-                return BadRequest("Trouble creating new auction.");
-            }
+            // } catch (Exception exception) {
+            //     Console.WriteLine(exception.Message);
+            //     return BadRequest("Trouble creating new auction.");
+            // }
         }
         
         [Authorize(Roles = "Admin")]
