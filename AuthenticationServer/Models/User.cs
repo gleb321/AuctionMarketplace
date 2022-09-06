@@ -12,13 +12,11 @@ namespace AuthenticationServer.Models {
         
         [Key]
         [Column("email")]
-        public string? Email { get; set; }
+        public string Email { get; set; }
         [Column("name")]
-        [Required]
-        public string? Name { get; set; }
+        public string Name { get; set; }
         [Column("surname")]
-        [Required]
-        public string? Surname { get; set; }
+        public string Surname { get; set; }
         
         public override string ToString() {
             return $"{Name} {Surname} {Email}";
