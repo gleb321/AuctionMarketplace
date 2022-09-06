@@ -29,6 +29,10 @@ namespace AuctionService.Controllers {
         [HttpPost]
         public async Task<IActionResult> AddAuction([FromBody] ClientAuctionModel auction) {
             try {
+                string token = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+                (string clientId, string role) = JwtParser.GetClaims(token, Authenticator.TokenType.Access);
+                auction.SellerId = clientId;
+                
                 //TODO использовать библиотеку для построения запросов(защита от SQL injection)
                 string text = "BEGIN;INSERT INTO Auctions (title, description, start_bid, start_time, finish_time, seller_id) " +
                               $"VALUES ({auction.ToInsertString()}) RETURNING id;";
