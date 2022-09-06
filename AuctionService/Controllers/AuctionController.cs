@@ -29,9 +29,10 @@ namespace AuctionService.Controllers {
         [HttpPost]
         public async Task<IActionResult> AddAuction([FromBody] ClientAuctionModel auction) {
             try {
-                //TODO использовать библиотеку для построения запросов
+                //TODO использовать библиотеку для построения запросов(защита от SQL injection)
                 string text = "BEGIN;INSERT INTO Auctions (title, description, start_bid, start_time, finish_time, seller_id) " +
                               $"VALUES ({auction.ToInsertString()}) RETURNING id;";
+                
                 Func<int, Task<HttpResponseMessage>> getResponse = id => {
                     var data = new {id, auction.SellerId, auction.StartTime, auction.FinishTime, StartPrice = auction.StartBid};
                     var content = new StringContent(JsonSerializer.Serialize(data), Encoding.UTF8, "application/json");
@@ -55,8 +56,10 @@ namespace AuctionService.Controllers {
             try {
                 string text = "BEGIN;UPDATE Auctions SET (title, description, start_bid, start_time, finish_time) = " +
                               $"({auction.ToUpdateString()}) WHERE id = {id} RETURNING seller_id, is_active;";
+                
                 string token = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
                 (string clientId, string role) = JwtParser.GetClaims(token, Authenticator.TokenType.Access);
+                
                 await AuctionCrudOperations.ChangeAuction(_pgDataBase.GetConnectionString(), AuctionCrudOperations.ChangeType.Update,
                     text, clientId);
                 
@@ -77,8 +80,9 @@ namespace AuctionService.Controllers {
                 string text = $"BEGIN;DELETE FROM Auctions WHERE id = {id} RETURNING seller_id, is_active;";
                 string token = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
                 (string clientId, string role) = JwtParser.GetClaims(token, Authenticator.TokenType.Access);
-                await AuctionCrudOperations.ChangeAuction(_pgDataBase.GetConnectionString(), AuctionCrudOperations.ChangeType.Delete,
-                    text, clientId);
+                
+                await AuctionCrudOperations.ChangeAuction(
+                    _pgDataBase.GetConnectionString(), AuctionCrudOperations.ChangeType.Delete, text, clientId);
                 
                 return Ok("Auction was successfully deleted.");
             } catch (InvalidOperationException exception) {
@@ -92,10 +96,7 @@ namespace AuctionService.Controllers {
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetAuction(int id) {
-            var auction = await (from dbAuction in _pgDataBase.Auctions
-                where dbAuction.Id == id
-                select dbAuction).SingleOrDefaultAsync();
-
+            var auction = await (from dbAuction in _pgDataBase.Auctions where dbAuction.Id == id select dbAuction).SingleOrDefaultAsync();
             if (auction is null) {
                 return NotFound("Auction with this id does not exist.");
             }
